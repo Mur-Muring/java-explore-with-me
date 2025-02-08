@@ -37,5 +37,4 @@ public class StatisticsClient  extends BaseClient {
         );
         return get("/stats?start={start}&end={end}&uris=uris&unique={unique}", params);
     }
-
 }

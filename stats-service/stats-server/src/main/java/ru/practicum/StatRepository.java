@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StatRepository  extends JpaRepository<Statistics, Long> {
+
     @Query("""
             SELECT new ru.practicum.StatOutDto(s.ip, s.uri, COUNT(DISTINCT s.ip))
             FROM Statistics AS s

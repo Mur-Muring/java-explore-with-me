@@ -17,6 +17,7 @@ import java.util.List;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StatisticsServiceBase implements StatisticsService {
+
     private final StatRepository statRepository;
 
     @Override

@@ -47,5 +47,4 @@ public class ErrorHandler {
         log.warn("Validation errors: {}", errors);
         return errors;
     }
-
 }

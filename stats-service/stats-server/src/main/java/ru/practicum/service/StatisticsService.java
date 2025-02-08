@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StatisticsService {
+
     StatDto create(StatInDto statInDto);
 
     List<StatOutDto> get(LocalDateTime start,
