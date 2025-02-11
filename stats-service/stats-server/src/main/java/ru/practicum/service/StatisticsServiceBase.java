@@ -22,8 +22,8 @@ public class StatisticsServiceBase implements StatisticsService {
 
     @Override
     @Transactional
-    public StatDto create(StatInDto statInDto) {
-        Statistics statistics = StatisticsMapper.toStatistics(statInDto);
+    public StatDto create(StatDto statDto) {
+        Statistics statistics = StatisticsMapper.toStatistics(statDto);
 
         return StatisticsMapper.toStatDto(statRepository.save(statistics));
     }

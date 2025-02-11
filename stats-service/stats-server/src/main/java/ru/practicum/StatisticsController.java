@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.StatisticsService;
-import ru.practicum.StatInDto;
-import ru.practicum.StatOutDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,8 +21,8 @@ public class StatisticsController {
 
     @PostMapping(value = "/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void postHit(@Valid @RequestBody StatInDto statInDto) {
-        statisticsService.create(statInDto);
+    public void postHit(@Valid @RequestBody StatDto statDto) {
+        statisticsService.create(statDto);
     }
 
     @GetMapping("/stats")

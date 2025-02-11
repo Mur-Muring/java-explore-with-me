@@ -1,8 +1,5 @@
 package ru.practicum;
 
-import ru.practicum.StatDto;
-import ru.practicum.StatInDto;
-
 public class StatisticsMapper {
 
     public static StatDto toStatDto(Statistics statistics) {
@@ -13,13 +10,13 @@ public class StatisticsMapper {
                 .build();
     }
 
-    public static Statistics toStatistics(StatInDto statInDto) {
+    public static Statistics toStatistics(StatDto statDto) {
         return new Statistics(
                 null,
-                statInDto.getApp(),
-                statInDto.getUri(),
-                statInDto.getIp(),
-                statInDto.getTimestamp()
+                statDto.getApp(),
+                statDto.getUri(),
+                statDto.getIp(),
+                statDto.getTimestamp()
         );
     }
 }
