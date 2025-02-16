@@ -21,7 +21,7 @@ public class StatisticsClient extends BaseClient {
     private String serviceName;
 
     @Autowired
-    public StatisticsClient(@Value("${stats-service.url}") String serviceUrl, RestTemplateBuilder builder) {
+    public StatisticsClient(@Value("${client.url}") String serviceUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serviceUrl + ""))
