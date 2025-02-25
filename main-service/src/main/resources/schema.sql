@@ -8,8 +8,8 @@ DROP TABLE If EXISTS requests CASCADE;
 DROP TABLE If EXISTS comments CASCADE;
 CREATE TABLE IF NOT EXISTS users (
     id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY UNIQUE,
-    name  VARCHAR(50)        NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL
+    name  VARCHAR(250)        NOT NULL,
+    email VARCHAR(254) UNIQUE NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS events (
     participant_limit  INTEGER DEFAULT 0,
     published_date     TIMESTAMP WITHOUT TIME ZONE,
     request_moderation BOOLEAN DEFAULT true,
-    status             VARCHAR(20),
+    status             VARCHAR(200),
     title              VARCHAR(120)                NOT NULL,
     CONSTRAINT fk_event_to_user FOREIGN KEY (initiator_id) REFERENCES users (id),
     CONSTRAINT fk_event_to_category FOREIGN KEY (category_id) REFERENCES categories (id),
