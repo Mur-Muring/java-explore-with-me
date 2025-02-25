@@ -160,12 +160,7 @@ public class EventServiceBase implements EventService {
             throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
         }
 
-        statsClient.postHit(StatDto.builder()
-                .app(applicationName)
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
-                .build());
+        statsClient.postHit(request);
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViews(List.of(event));
@@ -265,12 +260,7 @@ public class EventServiceBase implements EventService {
             }
         }
 
-        statsClient.postHit(StatDto.builder()
-                .app(applicationName)
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
-                .build());
+        statsClient.postHit(request);
 
         Pageable pageable = PageRequest.of(eventParams.getFrom() / eventParams.getSize(), eventParams.getSize());
 
