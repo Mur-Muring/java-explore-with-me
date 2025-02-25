@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.practicum.StatDto;
 import ru.practicum.StatOutDto;
 import ru.practicum.client.StatisticsClient;
 import ru.practicum.ewm.category.Category;
@@ -159,7 +160,12 @@ public class EventServiceBase implements EventService {
             throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
         }
 
-        statsClient.postHit(request);
+        statsClient.postHit(StatDto.builder()
+                .app(applicationName)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build());
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViews(List.of(event));
@@ -259,7 +265,12 @@ public class EventServiceBase implements EventService {
             }
         }
 
-        statsClient.postHit(request);
+        statsClient.postHit(StatDto.builder()
+                .app(applicationName)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build());
 
         Pageable pageable = PageRequest.of(eventParams.getFrom() / eventParams.getSize(), eventParams.getSize());
 
