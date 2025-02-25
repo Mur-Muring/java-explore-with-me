@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.practicum.StatDto;
 import ru.practicum.StatOutDto;
 import ru.practicum.client.StatisticsClient;
 import ru.practicum.ewm.category.Category;
@@ -116,7 +115,7 @@ public class EventServiceBase implements EventService {
         Event oldEvent = checkEvent(eventId);
 
         if (oldEvent.getEventStatus().equals(EventStatus.PUBLISHED) || oldEvent.getEventStatus().equals(EventStatus.CANCELED)) {
-            throw new ValidatetionConflict("Событие со статусом status= " + oldEvent.getEventStatus() +  "изменить нельзя");
+            throw new ValidatetionConflict("Событие со статусом status= " + oldEvent.getEventStatus() + "изменить нельзя");
         }
 
         Event eventForUpdate = eventUpdateBase(oldEvent, updateEvent);
@@ -371,12 +370,13 @@ public class EventServiceBase implements EventService {
         Map<Long, Long> viewStatsMap = new HashMap<>();
 
         if (earliestDate != null) {
-            ResponseEntity<Object> response = statsClient.getStatistics(earliestDate.toString(), LocalDateTime.now().toString(),uris, true); ///????
-            List<StatOutDto> statOutDtoList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {}); ///// ????
+            ResponseEntity<Object> response = statsClient.getStatistics(earliestDate.toString(), LocalDateTime.now().toString(), uris, true); ///????
+            List<StatOutDto> statOutDtoList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
+            }); ///// ????
 
             viewStatsMap = statOutDtoList.stream()
                     .filter(statsDto -> statsDto.getUri().startsWith("/events/"))
-                    .collect(Collectors.toMap(statsDto -> Long.parseLong(statsDto.getUri().substring("/events/".length())),StatOutDto::getHits));
+                    .collect(Collectors.toMap(statsDto -> Long.parseLong(statsDto.getUri().substring("/events/".length())), StatOutDto::getHits));
         }
         return viewStatsMap;
     }
