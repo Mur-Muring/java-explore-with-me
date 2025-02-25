@@ -1,4 +1,5 @@
 FROM eclipse-temurin:21-jre-jammy
-WORKDIR /app
-COPY target/*.jar /app/stats-server-0.0.1-SNAPSHOT.jar
-ENTRYPOINT ["java","-jar","/app/stats-server-0.0.1-SNAPSHOT.jar"]
+VOLUME /tmp
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app.jar"]
