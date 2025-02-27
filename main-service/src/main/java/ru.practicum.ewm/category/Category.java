@@ -11,11 +11,16 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "categories")
+@Table(
+        name = "categories",
+        uniqueConstraints = {@UniqueConstraint(columnNames = "name")}
+)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Column(nullable = false, unique = true) // Уникальное ограничение на уровне БД
     String name;
 }

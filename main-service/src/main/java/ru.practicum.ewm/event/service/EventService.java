@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Service
 public interface EventService {
-    List<EventFullDto> getAllAdmin(EventAdminParams eventAdminParams);
+    List<EventFullDto> getAllAdmin(EventFilterParams eventAdminParams);
 
     EventFullDto updateAdmin(Long eventId, UpdateEventAdminRequest updateEvent);
 
@@ -24,7 +24,7 @@ public interface EventService {
 
     List<ParticipationRequestDto> getAllParticipationRequestsByOwner(Long userId, Long eventId);
 
-    List<EventShortDto> getAllPublic(EventParams eventParams, HttpServletRequest request);
+    List<EventShortDto> getAllPublic(EventFilterParams eventParams, HttpServletRequest request);
 
     EventFullDto getById(Long eventId, HttpServletRequest request);
 

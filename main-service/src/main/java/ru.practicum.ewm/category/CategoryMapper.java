@@ -1,11 +1,10 @@
 package ru.practicum.ewm.category;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.category.dto.CategoryInDto;
 import ru.practicum.ewm.category.dto.CategoryOutDto;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class CategoryMapper {
     public static CategoryOutDto toCategoryOutDto(Category category) {
         return CategoryOutDto.builder()
@@ -14,9 +13,8 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static Category toCategory(CategoryInDto categoryInDto) {
-        Category category = new Category(null,
+    public Category toCategory(CategoryInDto categoryInDto) {
+        return new Category(null,
                 categoryInDto.getName());
-        return category;
     }
 }

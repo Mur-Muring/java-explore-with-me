@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event.dto.EventFilterParams;
 import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.EventParams;
 import ru.practicum.ewm.event.dto.EventShortDto;
 
 import java.time.LocalDateTime;
@@ -40,31 +40,30 @@ public class EventPublicController {
             @RequestParam(defaultValue = "10") @Positive final int size,
             final HttpServletRequest request) {
 
+        log.info("==> Запрос (Public) на получение событий с фильтром");
+
         LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, formatter) : LocalDateTime.now();
-        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : LocalDateTime.now().plusYears(20);
+        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : LocalDateTime.MAX;
 
-        EventParams eventParams = new EventParams();
-        eventParams.setText(text);
-        eventParams.setCategories(categories);
-        eventParams.setPaid(paid);
-        eventParams.setRangeStart(start);
-        eventParams.setRangeEnd(end);
-        eventParams.setOnlyAvailable(onlyAvailable);
-        eventParams.setFrom(from);
-        eventParams.setSize(size);
-        if (Objects.nonNull(sort)) {
-            eventParams.setSort(sort.toString());
-        }
+        EventFilterParams eventFilterParams = EventFilterParams.builder()
+                .text(text)
+                .categories(categories)
+                .paid(paid)
+                .rangeStart(start)
+                .rangeEnd(end)
+                .onlyAvailable(onlyAvailable)
+                .from(from)
+                .size(size)
+                .sort(Objects.nonNull(sort) ? EventSort.fromString(sort).name() : null)
+                .build();
 
-        log.info("==> Запрос (Public) на получения событий с фильтром");
-        return eventService.getAllPublic(eventParams, request);
-
+        return eventService.getAllPublic(eventFilterParams, request);
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventById(@PathVariable(value = "eventId") @Min(1) Long eventId,
                                      HttpServletRequest request) {
-        log.info("GET запрос на получения полной информации о событии с  id= {}", eventId);
+        log.info("GET запрос на получение полной информации о событии с id= {}", eventId);
         return eventService.getById(eventId, request);
     }
 }

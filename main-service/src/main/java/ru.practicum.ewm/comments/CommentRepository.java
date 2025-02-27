@@ -1,8 +1,10 @@
-package ru.practicum.ewm.comment;
+package ru.practicum.ewm.comments;
 
+import org.hibernate.annotations.Comment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.ewm.comment.CountCommentsByEventDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +16,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Optional<Comment> findByAuthor_IdAndId(Long userId, Long id);
 
-    @Query("select new ru.practicum.ewm.comment.CountCommentsByEventDto(c.event.id, COUNT(c)) " +
+    @Query("select new CountCommentsByEventDto(c.event.id, COUNT(c)) " +
             "from comments as c where c.event.id in ?1 " +
             "GROUP BY c.event.id")
-    List<ru.practicum.ewm.comment.CountCommentsByEventDto> countCommentByEvent(List<Long> eventIds);
+    List<CountCommentsByEventDto> countCommentByEvent(List<Long> eventIds);
 
     @Query("select c " +
             "from comments as c " +

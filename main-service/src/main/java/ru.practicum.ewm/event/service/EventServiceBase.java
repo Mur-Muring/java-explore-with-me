@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +18,28 @@ import ru.practicum.StatOutDto;
 import ru.practicum.client.StatisticsClient;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryRepository;
-import ru.practicum.ewm.comment.CommentRepository;
 import ru.practicum.ewm.comment.CountCommentsByEventDto;
+import ru.practicum.ewm.comments.CommentRepository;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.mapper.EventMapper;
-import ru.practicum.ewm.exception.ValidationException;
-import ru.practicum.ewm.location.LocationMapper;
-import ru.practicum.ewm.event.model.*;
+import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventAdminState;
+import ru.practicum.ewm.event.model.EventStatus;
+import ru.practicum.ewm.event.model.EventUserState;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidatetionConflict;
+import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.location.Location;
+import ru.practicum.ewm.location.LocationMapper;
 import ru.practicum.ewm.location.LocationRepository;
-import ru.practicum.ewm.request.*;
+import ru.practicum.ewm.request.Request;
+import ru.practicum.ewm.request.RequestMapper;
+import ru.practicum.ewm.request.RequestRepository;
+import ru.practicum.ewm.request.RequestStatus;
 import ru.practicum.ewm.request.service.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,7 +63,7 @@ public class EventServiceBase implements EventService {
     private String applicationName;
 
     @Override
-    public List<EventFullDto> getAllAdmin(EventAdminParams eventParamsAdmin) {
+    public List<EventFullDto> getAllAdmin(EventFilterParams eventParamsAdmin) {
         PageRequest pageable = PageRequest.of(eventParamsAdmin.getFrom() / eventParamsAdmin.getSize(),
                 eventParamsAdmin.getSize());
 
@@ -251,7 +257,7 @@ public class EventServiceBase implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getAllPublic(EventParams eventParams, HttpServletRequest request) {
+    public List<EventShortDto> getAllPublic(EventFilterParams eventParams, HttpServletRequest request) {
 
         if (eventParams.getRangeEnd() != null && eventParams.getRangeStart() != null) {
             if (eventParams.getRangeEnd().isBefore(eventParams.getRangeStart())) {

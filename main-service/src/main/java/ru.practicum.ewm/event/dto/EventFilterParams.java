@@ -12,14 +12,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventParams {
-    String text;
+public class EventFilterParams {
+    // Общие параметры
     List<Long> categories;
-    Boolean paid;
     LocalDateTime rangeStart;
     LocalDateTime rangeEnd;
-    Boolean onlyAvailable = false;
+    Integer from;
+    Integer size;
+
+    // Специфичные для администратора
+    List<Long> users;
+    List<String> states;
+
+    // Специфичные для публичного запроса
+    String text;
+    Boolean paid;
+    Boolean onlyAvailable;
     String sort;
-    Integer from = 0;
-    Integer size = 10;
 }

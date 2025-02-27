@@ -1,6 +1,7 @@
 package ru.practicum.ewm.category.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import ru.practicum.ewm.category.CategoryMapper;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.category.dto.CategoryInDto;
 import ru.practicum.ewm.category.dto.CategoryOutDto;
+import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidatetionConflict;
 
@@ -19,15 +21,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceBase implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryOutDto getById(Long id) {
-        CategoryOutDto  categoryOutDto;
-        categoryOutDto = CategoryMapper.toCategoryOutDto(findCategory(id));
-        return categoryOutDto;
+        return CategoryMapper.toCategoryOutDto(findCategory(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryOutDto> get(Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
 
@@ -35,7 +38,6 @@ public class CategoryServiceBase implements CategoryService {
                 .stream()
                 .map(CategoryMapper::toCategoryOutDto)
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -47,8 +49,8 @@ public class CategoryServiceBase implements CategoryService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException("Категория с id= " + id + " не найден");
+        if (eventRepository.existsById(id)) {
+            throw new ValidatetionConflict("Нельзя удалить категорию с id= " + id + " :существуют активные задачи");
         }
         categoryRepository.deleteById(id);
     }
@@ -56,30 +58,24 @@ public class CategoryServiceBase implements CategoryService {
     @Override
     @Transactional
     public CategoryOutDto update(Long id, CategoryInDto categoryInDto) {
-        if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException("Категория с id= " + id + " не найдена");
-        }
-        Category category = findCategory(id);
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Категория с id= " + id + " не найдена"));
 
-        if (categoryInDto.getName() != null && !category.getName().equals(categoryInDto.getName()) && checkName(categoryInDto.getName())) {
-
+        if (categoryInDto.getName() != null && !category.getName().equals(categoryInDto.getName())) {
             category.setName(categoryInDto.getName());
-            category = categoryRepository.save(category);
 
+            try {
+                category = categoryRepository.save(category);
+            } catch (DataIntegrityViolationException e) {
+                throw new ValidatetionConflict("Категория с названием " + categoryInDto.getName() + " уже существует");
+            }
         }
+
         return CategoryMapper.toCategoryOutDto(category);
     }
 
     private Category findCategory(Long id) {
         return categoryRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Категории с id = " + id + " не существует"));
-    }
-
-    private boolean checkName(String name) {
-
-        if (categoryRepository.existsByNameIgnoreCase(name)) {
-            throw new ValidatetionConflict("Категория с названием " + name + " уже существует");
-        }
-        return true;
     }
 }
