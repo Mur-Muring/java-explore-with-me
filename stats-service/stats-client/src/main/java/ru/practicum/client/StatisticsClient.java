@@ -1,10 +1,11 @@
 package ru.practicum.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -13,6 +14,7 @@ import ru.practicum.StatDto;
 import ru.practicum.StatOutDto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,15 +49,25 @@ public class StatisticsClient extends BaseClient {
         return post("/hit", statDto);
     }
 
+
     public List<StatOutDto> getStatistics(String start, String end, List<String> uris, Boolean unique) {
         Map<String, Object> params = new HashMap<>();
         params.put("start", start);
         params.put("end", end);
-        params.put("uris", uris); // Можно оставить как List<String>
         params.put("unique", unique);
 
-        return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", params,
-                new ParameterizedTypeReference<List<StatOutDto>>() {
-                });
+        if (uris != null && !uris.isEmpty()) {
+            params.put("uris", String.join(",", uris));
+        }
+
+        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", params);
+
+        if (response.getBody() == null) {
+            return Collections.emptyList();
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(response.getBody(), new TypeReference<List<StatOutDto>>() {
+        });
     }
 }

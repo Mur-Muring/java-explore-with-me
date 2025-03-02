@@ -1,6 +1,5 @@
 package ru.practicum.client;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -16,15 +15,9 @@ public class BaseClient {
         this.restTemplate = restTemplate;
     }
 
-    protected <T> T get(String path, @Nullable Map<String, Object> parameters, ParameterizedTypeReference<T> responseType) {
-        ResponseEntity<T> response = restTemplate.exchange(
-                path,
-                HttpMethod.GET,
-                null,
-                responseType,
-                parameters
-        );
-        return response.getBody();
+
+    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
