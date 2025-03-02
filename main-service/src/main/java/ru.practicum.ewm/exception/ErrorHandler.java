@@ -34,7 +34,7 @@ public class ErrorHandler {
             MethodArgumentTypeMismatchException.class, MethodArgumentNotValidException.class,
             MissingServletRequestParameterException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorAPI handleBadRequest(RuntimeException e) {
+    public ErrorAPI handleBadRequest(Exception e) {
         log.error(stackToString(e));
         return ErrorAPI.builder()
                 .message(e.getMessage())
@@ -44,7 +44,7 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorAPI handleNotFound(NotFoundException e) {
         log.error(stackToString(e));
@@ -56,7 +56,7 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorAPI conflict(DataIntegrityViolationException e) {
         log.error(stackToString(e));
