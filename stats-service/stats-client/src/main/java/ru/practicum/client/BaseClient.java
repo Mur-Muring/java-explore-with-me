@@ -17,12 +17,14 @@ public class BaseClient {
     }
 
     protected <T> T get(String path, @Nullable Map<String, Object> parameters, ParameterizedTypeReference<T> responseType) {
-        ResponseEntity<T> response = restTemplate.exchange(path, HttpMethod.GET, null, responseType, parameters);
+        ResponseEntity<T> response = restTemplate.exchange(
+                path,
+                HttpMethod.GET,
+                null,
+                responseType,
+                parameters
+        );
         return response.getBody();
-    }
-
-    protected <T> ResponseEntity<Object> post(String path, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
@@ -62,5 +64,9 @@ public class BaseClient {
             return responseBuilder.body(response.getBody());
         }
         return responseBuilder.build();
+    }
+
+    protected <T> ResponseEntity<Object> post(String path, T body) {
+        return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 }

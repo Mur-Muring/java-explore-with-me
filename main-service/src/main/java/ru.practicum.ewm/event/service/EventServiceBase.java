@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,9 @@ public class EventServiceBase implements EventService {
     private final LocationRepository locationRepository;
     private final CommentRepository commentRepository;
     private final StatisticsClient statsClient;
-    private final ObjectMapper objectMapper;
+
+    @Value("${server.application.name:ewm-service}")
+    private String applicationName;
 
     @Override
     public List<EventFullDto> getAllAdmin(EventFilterParams eventParamsAdmin) {
