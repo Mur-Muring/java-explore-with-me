@@ -1,7 +1,7 @@
 package ru.practicum.ewm.event.controller;
 
 public enum EventSort {
-    DATE,
+    EVENT_DATE,
     VIEWS;
 
     public static EventSort fromString(String value) {

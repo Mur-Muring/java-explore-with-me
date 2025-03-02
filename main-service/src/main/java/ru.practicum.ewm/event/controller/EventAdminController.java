@@ -25,6 +25,7 @@ import java.util.List;
 public class EventAdminController {
     private final EventService eventService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final LocalDateTime MAX_TIMESTAMP = LocalDateTime.of(294276, 12, 31, 23, 59, 59);
 
     @GetMapping
     public List<EventFullDto> getAll(
@@ -39,7 +40,7 @@ public class EventAdminController {
         log.info("==> Запрос на получение всех событий (ADMIN)");
 
         LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, formatter) : LocalDateTime.now();
-        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : LocalDateTime.MAX;
+        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : MAX_TIMESTAMP;
 
         EventFilterParams eventFilterParams = EventFilterParams.builder()
                 .users(users)
