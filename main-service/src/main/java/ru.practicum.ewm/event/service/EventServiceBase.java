@@ -1,18 +1,15 @@
 package ru.practicum.ewm.event.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatOutDto;
 import ru.practicum.client.StatisticsClient;
@@ -58,9 +55,6 @@ public class EventServiceBase implements EventService {
     private final CommentRepository commentRepository;
     private final StatisticsClient statsClient;
     private final ObjectMapper objectMapper;
-
-    @Value("${server.application.name:ewm-service}")
-    private String applicationName;
 
     @Override
     public List<EventFullDto> getAllAdmin(EventFilterParams eventParamsAdmin) {
@@ -120,8 +114,8 @@ public class EventServiceBase implements EventService {
     public EventFullDto updateAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
         Event oldEvent = checkEvent(eventId);
 
-        if (oldEvent.getEventStatus().equals(EventStatus.PUBLISHED) || oldEvent.getEventStatus().equals(EventStatus.CANCELED)) {
-            throw new ValidatetionConflict("Событие со статусом status= " + oldEvent.getEventStatus() + "изменить нельзя");
+        if (!oldEvent.getEventStatus().equals(EventStatus.PENDING)) {
+            throw new ValidatetionConflict("Событие со статусом status= " + oldEvent.getEventStatus() + " изменить нельзя");
         }
 
         Event eventForUpdate = eventUpdateBase(oldEvent, updateEvent);
@@ -136,7 +130,6 @@ public class EventServiceBase implements EventService {
         if (updateEvent.getStateAction() != null) {
             if (EventAdminState.PUBLISH_EVENT.equals(updateEvent.getStateAction())) {
                 eventForUpdate.setEventStatus(EventStatus.PUBLISHED);
-
             } else if (EventAdminState.REJECT_EVENT.equals(updateEvent.getStateAction())) {
                 eventForUpdate.setEventStatus(EventStatus.CANCELED);
             }
@@ -367,22 +360,27 @@ public class EventServiceBase implements EventService {
                 .map(event -> String.format("/events/%s", event.getId()))
                 .collect(Collectors.toList());
 
-        List<LocalDateTime> startDates = events.stream()
+        LocalDateTime earliestDate = events.stream()
                 .map(Event::getCreatedDate)
-                .collect(Collectors.toList());
-        LocalDateTime earliestDate = startDates.stream()
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
+
         Map<Long, Long> viewStatsMap = new HashMap<>();
 
         if (earliestDate != null) {
-            ResponseEntity<Object> response = statsClient.getStatistics(earliestDate.toString(), LocalDateTime.now().toString(), uris, true); ///????
-            List<StatOutDto> statOutDtoList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
-            }); ///// ????
+            List<StatOutDto> statOutDtoList = statsClient.getStatistics(
+                    earliestDate.toString(),
+                    LocalDateTime.now().toString(),
+                    uris,
+                    true
+            );
 
             viewStatsMap = statOutDtoList.stream()
                     .filter(statsDto -> statsDto.getUri().startsWith("/events/"))
-                    .collect(Collectors.toMap(statsDto -> Long.parseLong(statsDto.getUri().substring("/events/".length())), StatOutDto::getHits));
+                    .collect(Collectors.toMap(
+                            statsDto -> Long.parseLong(statsDto.getUri().substring("/events/".length())),
+                            StatOutDto::getHits
+                    ));
         }
         return viewStatsMap;
     }
