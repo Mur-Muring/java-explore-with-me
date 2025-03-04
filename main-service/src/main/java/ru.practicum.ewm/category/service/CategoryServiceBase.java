@@ -48,11 +48,11 @@ public class CategoryServiceBase implements CategoryService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        if (eventRepository.existsById(id)) {
-            throw new ValidatetionConflict("Нельзя удалить категорию с id= " + id + " :существуют активные задачи");
+    public void delete(Long categoryId) {
+        if (eventRepository.existsByCategoryId(categoryId)) {
+            throw new ValidatetionConflict("Нельзя удалить категорию с id= " + categoryId + " : существуют активные задачи");
         }
-        categoryRepository.deleteById(id);
+        categoryRepository.deleteById(categoryId);
     }
 
     @Override
@@ -63,14 +63,8 @@ public class CategoryServiceBase implements CategoryService {
 
         if (categoryInDto.getName() != null && !category.getName().equals(categoryInDto.getName())) {
             category.setName(categoryInDto.getName());
-
-            try {
-                category = categoryRepository.save(category);
-            } catch (DataIntegrityViolationException e) {
-                throw new ValidatetionConflict("Категория с названием " + categoryInDto.getName() + " уже существует");
-            }
+            category = categoryRepository.save(category); // Ошибка обработается обработчиком
         }
-
         return CategoryMapper.toCategoryOutDto(category);
     }
 
