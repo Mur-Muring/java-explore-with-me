@@ -15,12 +15,9 @@ public class BaseClient {
         this.restTemplate = restTemplate;
     }
 
-    protected ResponseEntity<Object> get(final String path, @Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest((HttpMethod.GET), path, parameters, null);
-    }
 
-    protected <T> ResponseEntity<Object> post(String path, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, null, body);
+    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
@@ -60,5 +57,9 @@ public class BaseClient {
             return responseBuilder.body(response.getBody());
         }
         return responseBuilder.build();
+    }
+
+    protected <T> ResponseEntity<Object> post(String path, T body) {
+        return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 }
