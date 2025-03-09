@@ -86,4 +86,16 @@ public class ErrorHandler {
         e.printStackTrace(pw);
         return sw.toString();
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorAPI handleIllegalState(IllegalStateException e) {
+        log.error(stackToString(e));
+        return ErrorAPI.builder()
+                .message(e.getMessage())
+                .reason("Business logic constraint violated.")
+                .status("BAD_REQUEST")
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }

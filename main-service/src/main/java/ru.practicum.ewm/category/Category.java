@@ -21,6 +21,6 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false, unique = true) // Уникальное ограничение на уровне БД
+    @Column(nullable = false)
     String name;
 }
