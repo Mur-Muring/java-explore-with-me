@@ -9,5 +9,5 @@ import ru.practicum.ewm.event.model.EventAdminState;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateEventAdminRequest extends UpdateEventBase {
-   private EventAdminState stateAction;
+    private EventAdminState stateAction;
 }
