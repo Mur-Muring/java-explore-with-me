@@ -12,7 +12,6 @@ import ru.practicum.ewm.comments.dto.CommentInDto;
 import ru.practicum.ewm.comments.dto.CommentOutDto;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventStatus;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidatetionConflict;
 import ru.practicum.ewm.user.User;
@@ -100,22 +99,9 @@ public class CommentServiceBase implements CommentService {
     public CommentOutDto create(Long userId, Long eventId, CommentInDto commentDto) {
         Event event = ensureEventExists(eventId);
         User user = ensureUserExists(userId);
-
-        // Проверяем, опубликовано ли событие
-        if (!EventStatus.PUBLISHED.equals(event.getEventStatus())) {
-            throw new IllegalStateException("Нельзя комментировать неопубликованное событие");
-        }
-
-        // Проверяем, завершилось ли событие
-        if (event.getEventDate().isAfter(LocalDateTime.now())) {
-            throw new IllegalStateException("Нельзя комментировать событие, которое ещё не закончилось");
-        }
-
-        Comment comment = CommentMapper.toComment(commentDto, event, user);
-
-        Comment savedComment = commentRepository.save(comment);
-        return CommentMapper.toCommentDto(savedComment);
+        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
     }
+
 
     private Comment checkComment(Long id) {
         return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Комментарий c id = {}  не найден" + id));
