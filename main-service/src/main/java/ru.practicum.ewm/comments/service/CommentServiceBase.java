@@ -111,10 +111,7 @@ public class CommentServiceBase implements CommentService {
             throw new IllegalStateException("Нельзя комментировать событие, которое ещё не закончилось");
         }
 
-        Comment comment = CommentMapper.toComment(commentDto, event, user);
-
-        Comment savedComment = commentRepository.save(comment);
-        return CommentMapper.toCommentDto(savedComment);
+        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
     }
 
 
