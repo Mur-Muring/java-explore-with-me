@@ -3,8 +3,10 @@ package ru.practicum.ewm.comments.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.comments.Comment;
 import ru.practicum.ewm.comments.CommentMapper;
 import ru.practicum.ewm.comments.CommentRepository;
@@ -80,7 +82,6 @@ public class CommentServiceBase implements CommentService {
 
     @Override
     public void deleteAdmin(Long commentId) {
-        Comment comment = checkComment(commentId);
         commentRepository.deleteById(commentId);
     }
 
@@ -101,14 +102,12 @@ public class CommentServiceBase implements CommentService {
         Event event = ensureEventExists(eventId);
         User user = ensureUserExists(userId);
 
-        // Проверяем, опубликовано ли событие
         if (!EventStatus.PUBLISHED.equals(event.getEventStatus())) {
-            throw new IllegalStateException("Нельзя комментировать неопубликованное событие");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя комментировать неопубликованное событие");
         }
 
-        // Проверяем, завершилось ли событие
         if (event.getEventDate().isAfter(LocalDateTime.now())) {
-            throw new IllegalStateException("Нельзя комментировать событие, которое ещё не закончилось");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя комментировать событие, которое ещё не закончилось");
         }
 
         return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
