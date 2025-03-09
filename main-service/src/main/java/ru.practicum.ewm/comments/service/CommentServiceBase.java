@@ -1,6 +1,7 @@
 package ru.practicum.ewm.comments.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentServiceBase implements CommentService {
@@ -102,6 +104,7 @@ public class CommentServiceBase implements CommentService {
         Event event = ensureEventExists(eventId);
         User user = ensureUserExists(userId);
 
+        log.info("Проверяем статус события: id={}, статус={}", event.getId(), event.getEventStatus());
         if (!EventStatus.PUBLISHED.equals(event.getEventStatus())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя комментировать неопубликованное событие");
         }
