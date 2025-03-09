@@ -104,6 +104,87 @@
           "response": []
         },
         {
+          "name": "Добавление пользователем нового комментария по несуществующему событию",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {",
+                  "    const api = new API(pm);",
+                  "    const rnd = new RandomUtils();",
+                  "",
+                  "    try {",
+                  "         const user = await api.addUser(rnd.getUser());",
+                  "         const category = await api.addCategory(rnd.getCategory());",
+                  "         const event = await api.addEvent(user.id, rnd.getEvent(category.id));",
+                  "         pm.collectionVariables.set('uid', user.id);",
+                  "         pm.collectionVariables.set('nonExistentEventId', 'non-existent-event-id');",
+                  "    } catch (err) {",
+                  "        console.error('Ошибка при подготовке тестовых данных.', err);",
+                  "    }",
+                  "};",
+                  "",
+                  "main();"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ должен содержать код статуса 404 и данные в формате json', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"text\":\"комментарий\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments?eventId={{nonExistentEventId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "eventId",
+                  "value": "{{nonExistentEventId}}",
+                  "description": "(Required) id несуществующего события"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Удаление администратором несуществующего коментария",
           "event": [
             {
@@ -339,7 +420,8 @@
               ");"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         },
         {
@@ -371,7 +453,8 @@
               "});"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         }
       ],
@@ -462,7 +545,8 @@
               ");"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         },
         {
@@ -491,7 +575,8 @@
               ""
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         }
       ],
@@ -575,7 +660,8 @@
               "})"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         },
         {
@@ -615,7 +701,8 @@
               ");"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         }
       ],
@@ -698,7 +785,8 @@
               ");"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         },
         {
@@ -721,7 +809,8 @@
               "});"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         }
       ],
@@ -797,7 +886,8 @@
               ");"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         },
         {
@@ -821,7 +911,8 @@
               "});"
             ],
             "type": "text/javascript",
-            "packages": {}
+            "packages": {
+            }
           }
         }
       ],

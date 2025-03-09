@@ -1,8 +1,11 @@
 package ru.practicum.ewm.comments.controller;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.comments.dto.CommentOutDto;
 import ru.practicum.ewm.comments.service.CommentService;
@@ -10,6 +13,7 @@ import ru.practicum.ewm.comments.service.CommentService;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/comments")
@@ -19,15 +23,17 @@ public class CommentAdminController {
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long commentId) {
-        log.info("==> удаление комментария id = {} ", commentId);
+        log.info("==> удаление комментария id = {}", commentId);
         commentService.deleteAdmin(commentId);
     }
 
     @GetMapping("/search")
     public List<CommentOutDto> search(@RequestParam(name = "text") String text,
-                                      @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                      @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        log.info("==> Поиск комментариев c текстом = {}", text);
+                                      @RequestParam(value = "from", defaultValue = "0")
+                                      @PositiveOrZero Integer from,
+                                      @RequestParam(value = "size", defaultValue = "10")
+                                      @Positive Integer size) {
+        log.info("==> Поиск комментариев с текстом = {}", text);
         return commentService.search(text, from, size);
     }
 }

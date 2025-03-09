@@ -12,6 +12,7 @@ import ru.practicum.ewm.comments.dto.CommentInDto;
 import ru.practicum.ewm.comments.dto.CommentOutDto;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventStatus;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidatetionConflict;
 import ru.practicum.ewm.user.User;
@@ -33,7 +34,7 @@ public class CommentServiceBase implements CommentService {
     @Override
     @Transactional
     public CommentOutDto update(Long userId, Long commentId, CommentInDto updateCommentDto) {
-        User user = checkUser(userId);
+        User user = ensureUserExists(userId);
         Comment comment = checkComment(commentId);
         checkAuthorComment(user, comment);
         LocalDateTime updateTime = LocalDateTime.now();
@@ -46,7 +47,7 @@ public class CommentServiceBase implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentOutDto> getByUser(Long userId) {
-        checkUser(userId);
+        ensureUserExists(userId);
         List<Comment> commentList = commentRepository.findByAuthor_Id(userId);
         return commentList.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
     }
@@ -54,7 +55,7 @@ public class CommentServiceBase implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public CommentOutDto getByUserAndCommentId(Long userId, Long commentId) {
-        checkUser(userId);
+        ensureUserExists(userId);
         Comment comment = commentRepository.findByAuthor_IdAndId(userId, commentId).orElseThrow(() -> new NotFoundException(
                 String.format("У пользователя c id = {}  не найден комментарий с id = {}", userId, commentId)));
         return CommentMapper.toCommentDto(comment);
@@ -63,7 +64,7 @@ public class CommentServiceBase implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentOutDto> getByEvent(Long eventId, Integer from, Integer size) {
-        Event event = checkEvent(eventId);
+        Event event = ensureEventExists(eventId);
         PageRequest pageable = PageRequest.of(from / size, size);
         List<Comment> commentList = commentRepository.findAllByEvent_Id(eventId, pageable);
         return commentList.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
@@ -71,7 +72,7 @@ public class CommentServiceBase implements CommentService {
 
     @Override
     public void delete(Long userId, Long commentId) {
-        User user = checkUser(userId);
+        User user = ensureUserExists(userId);
         Comment comment = checkComment(commentId);
         checkAuthorComment(user, comment);
         commentRepository.deleteById(commentId);
@@ -97,9 +98,23 @@ public class CommentServiceBase implements CommentService {
     @Override
     @Transactional
     public CommentOutDto create(Long userId, Long eventId, CommentInDto commentDto) {
-        Event event = checkEvent(eventId);
-        User user = checkUser(userId);
-        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
+        Event event = ensureEventExists(eventId);
+        User user = ensureUserExists(userId);
+
+        // Проверяем, опубликовано ли событие
+        if (!EventStatus.PUBLISHED.equals(event.getEventStatus())) {
+            throw new IllegalStateException("Нельзя комментировать неопубликованное событие");
+        }
+
+        // Проверяем, завершилось ли событие
+        if (event.getEventDate().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Нельзя комментировать событие, которое ещё не закончилось");
+        }
+
+        Comment comment = CommentMapper.toComment(commentDto, event, user);
+
+        Comment savedComment = commentRepository.save(comment);
+        return CommentMapper.toCommentDto(savedComment);
     }
 
     private Comment checkComment(Long id) {
@@ -112,12 +127,11 @@ public class CommentServiceBase implements CommentService {
         }
     }
 
-    private Event checkEvent(Long id) {
+    private Event ensureEventExists(Long id) {
         return eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Событие с id = {}  не найдено" + id));
     }
 
-    private User checkUser(Long id) {
+    private User ensureUserExists(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь c  id = {}  не найден" + id));
     }
-
 }

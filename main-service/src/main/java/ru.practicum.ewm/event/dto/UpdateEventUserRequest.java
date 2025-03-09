@@ -1,9 +1,7 @@
 package ru.practicum.ewm.event.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.event.model.EventUserState;
 
 
@@ -11,6 +9,7 @@ import ru.practicum.ewm.event.model.EventUserState;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventUserRequest extends UpdateEventBase {
-    private EventUserState stateAction;
+    EventUserState stateAction;
 }
