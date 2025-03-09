@@ -9,7 +9,6 @@ import ru.practicum.ewm.event.model.EventUserState;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventUserRequest extends UpdateEventBase {
-    EventUserState stateAction;
+   private EventUserState stateAction;
 }

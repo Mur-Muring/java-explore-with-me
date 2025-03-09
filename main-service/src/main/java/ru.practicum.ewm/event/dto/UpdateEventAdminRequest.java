@@ -8,7 +8,6 @@ import ru.practicum.ewm.event.model.EventAdminState;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventAdminRequest extends UpdateEventBase {
-    EventAdminState stateAction;
+   private EventAdminState stateAction;
 }
