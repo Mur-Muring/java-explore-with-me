@@ -16,13 +16,13 @@ import ru.practicum.ewm.category.service.CategoryService;
 @RestController
 @RequestMapping(path = "/admin/categories")
 @RequiredArgsConstructor
-public class  CategoryAdminController {
+public class CategoryAdminController {
     private final CategoryService categoryService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryOutDto createCategory(@RequestBody @Valid CategoryInDto categoryInDto) {
-        log.info("==> Cоздание новой категории: {}", categoryInDto);
+        log.info("==> Cоздание новой категории: {}", categoryInDto.toString());
         return categoryService.create(categoryInDto);
     }
 
