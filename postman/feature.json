@@ -60,9 +60,16 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/comments/users/{{uid}}/{{comid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["comments", "users", "{{uid}}", "{{comid}}"]
+              "raw": "{{baseUrl}}/users/{{uid}}/comments/{{comid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{uid}}",
+                "comments",
+                "{{comid}}"
+              ]
             }
           },
           "response": []
@@ -423,8 +430,13 @@
               "    pm.response.to.be.json;",
               "});",
               "",
-              "const target = pm.response.json();",
+              "pm.test(\"Ответ сервера должен содержать сообщение об ошибке в случае проблемы\", function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('message');",
+              "    pm.expect(response.message).to.be.a('string');",
+              "});",
               "",
+              "const target = pm.response.json();",
               "pm.test(\"Комментарий должен содержать поля: id, text, eventId, authorId, created, lastUpdatedOn\", function () {",
               "    pm.expect(target).to.have.property('id');",
               "    pm.expect(target).to.have.property('text');",
@@ -461,7 +473,7 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/comments/users/{{uid}}/events/{{eid}}",
+          "raw": "{{baseUrl}}/comments/users/{{uid}}/comments?eventId={{eid}}",
           "host": [
             "{{baseUrl}}"
           ],
@@ -469,119 +481,16 @@
             "comments",
             "users",
             "{{uid}}",
-            "events",
-            "{{eid}}"
+            "comments"
+          ],
+          "query": [
+            {
+              "key": "eventId",
+              "value": "{{eid}}"
+            }
           ]
         },
         "description": "Обратите внимание: Отменить можно только событие в состоянии ожидания модерации."
-      },
-      "response": []
-    },
-    {
-      "name": "Удвленеи пользователем своего коментария",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
-              "    pm.response.to.have.status(204);\r",
-              "});\r",
-              "const source = pm.collectionVariables.get('response');\r",
-              "const comId = pm.collectionVariables.get('uid','comid');\r",
-              "\r",
-              "let body\r",
-              "const req = {\r",
-              "                url: \"http://localhost:8080/comments/users/\" + pm.collectionVariables.get(\"uid\") +\"/\" \r",
-              "                + pm.collectionVariables.get(\"comid\"),\r",
-              "                method: \"GET\",\r",
-              "                body: body == null ? \"\" : JSON.stringify(body),\r",
-              "                header: { \"Content-Type\": \"application/json\" },\r",
-              "            };\r",
-              "            \r",
-              "pm.sendRequest(req, (error, response) => {\r",
-              "    pm.test(\"Комментарий должен быть удалён после выполнения запроса, запрос на получение комментария должен иметь код 404\", function(){\r",
-              "        pm.expect(response.code).to.eql(404);\r",
-              "        \r",
-              "    });\r",
-              "})"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              "const main = async () => {\r",
-              "    const api = new API(pm);\r",
-              "    const rnd = new RandomUtils();\r",
-              "\r",
-              "    let compilation;\r",
-              "    try {\r",
-              "        const user = await api.addUser(rnd.getUser());\r",
-              "        const category = await api.addCategory(rnd.getCategory());\r",
-              "        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-              "        const comment = await api.addComment(user.id,event.id,rnd.getComment(user.id,event.id));\r",
-              "        pm.collectionVariables.set(\"uid\", user.id);\r",
-              "        pm.collectionVariables.set(\"comid\",comment.id); \r",
-              "    } catch(err) {\r",
-              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-              "    }\r",
-              "};\r",
-              "\r",
-              "const interval = setInterval(() => {}, 1000);\r",
-              "\r",
-              "setTimeout(async () => \r",
-              "    {\r",
-              "        try {\r",
-              "            await main();\r",
-              "        } catch (e) {\r",
-              "            console.error(e);\r",
-              "        } finally {\r",
-              "            clearInterval(interval);\r",
-              "        }\r",
-              "    },  \r",
-              "    100 \r",
-              ");"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "comments",
-            "users",
-            ":userId",
-            ":commentId"
-          ],
-          "variable": [
-            {
-              "key": "userId",
-              "value": "{{uid}}",
-              "description": "(Required) id пользователя"
-            },
-            {
-              "key": "commentId",
-              "value": "{{comid}}"
-            }
-          ]
-        }
       },
       "response": []
     },
