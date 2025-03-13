@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.event.model.Event;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +16,4 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findAllByIdIn(List<Long> ids);
 
     boolean existsByCategoryId(Long categoryId);
-
-    List<Event> findByEventDateBetween(LocalDateTime start, LocalDateTime end);
 }

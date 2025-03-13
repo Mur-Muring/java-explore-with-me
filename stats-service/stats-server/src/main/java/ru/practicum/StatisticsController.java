@@ -34,14 +34,4 @@ public class StatisticsController {
             @RequestParam(defaultValue = "false") Boolean unique) {
         return statisticsService.get(start, end, uris, unique);
     }
-
-    @GetMapping("/comment-stats")
-    @ResponseStatus(HttpStatus.OK)
-    public List<EventCommentStatDto> getCommentStats(
-            @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime start,
-            @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime end,
-            @RequestParam(required = false) List<String> uris,
-            @RequestParam(defaultValue = "false") Boolean unique) {
-        return statisticsService.getCommentsStats(start, end, uris, unique);
-    }
 }
