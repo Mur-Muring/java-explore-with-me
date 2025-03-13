@@ -7,6 +7,102 @@
   },
   "item": [
     {
+      "name": "Создание пользователя",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Response contains required fields\", function () {",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('name');",
+              "    pm.expect(jsonData).to.have.property('email');",
+              "});",
+              "",
+              "pm.environment.set(\"userId\", jsonData.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Создание события",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"annotation\": \"Аннотация события для теста создания, более 20 символов\",\n  \"category\": 1,\n  \"description\": \"Описание события для теста создания, более 20 символов для прохождения валидации.\",\n  \"eventDate\": \"2025-03-12T12:00:00\",\n  \"location\": {\n    \"lat\": 55.7522,\n    \"lon\": 37.6156\n  },\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": true,\n  \"title\": \"Test Event Title\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/users/{{userId}}/events",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users",
+            "{{userId}}",
+            "events"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"eventId\", jsonData.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "Добавление собственного комментария",
       "request": {
         "method": "POST",
@@ -21,7 +117,7 @@
           "raw": "{\n  \"text\": \"Тестовый комментарий\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/users/1/comments?eventId=1",
+          "raw": "http://localhost:8080/users/{{userId}}/comments?eventId={{eventId}}",
           "protocol": "http",
           "host": [
             "localhost"
@@ -29,13 +125,13 @@
           "port": "8080",
           "path": [
             "users",
-            "1",
+            "{{userId}}",
             "comments"
           ],
           "query": [
             {
               "key": "eventId",
-              "value": "1"
+              "value": "{{eventId}}"
             }
           ]
         }
@@ -44,8 +140,7 @@
       "event": [
         {
           "listen": "test",
-          "script": {
-            "type": "text/javascript",
+          "script": {"type": "text/javascript",
             "exec": [
               "pm.test(\"Status code is 201\", function () {",
               "    pm.response.to.have.status(201);",
