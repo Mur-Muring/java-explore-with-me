@@ -7,145 +7,63 @@
   },
   "item": [
     {
-      "name": "Получение всех коментариев по событию",
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              "const main = async () => {\r",
-              "    const api = new API(pm);\r",
-              "    const rnd = new RandomUtils();\r",
-              "\r",
-              "    try {\r",
-              "        const user  = await api.addUser(rnd.getUser());\r",
-              "        const user2 = await api.addUser(rnd.getUser());\r",
-              "        const user3 = await api.addUser(rnd.getUser());\r",
-              "\r",
-              "        const category = await api.addCategory(rnd.getCategory());\r",
-              "        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-              "        \r",
-              "        const commentU2 = await api.addComment(user2.id,event.id,rnd.getComment(user2.id,event.id));\r",
-              "        const commentU3 = await api.addComment(user3.id,event.id,rnd.getComment(user3.id,event.id));\r",
-              "\r",
-              "        pm.collectionVariables.set(\"eid\", event.id)\r",
-              "        \r",
-              "    } catch(err) {\r",
-              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-              "    }\r",
-              "};\r",
-              "\r",
-              "const interval = setInterval(() => {}, 1000);\r",
-              "\r",
-              "setTimeout(async () => \r",
-              "    {\r",
-              "        try {\r",
-              "            await main();\r",
-              "        } catch (e) {\r",
-              "            console.error(e);\r",
-              "        } finally {\r",
-              "            clearInterval(interval);\r",
-              "        }\r",
-              "    },  \r",
-              "    100 \r",
-              ");"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-              "    pm.response.to.be.ok;    \r",
-              "    pm.response.to.be.withBody;\r",
-              "    pm.response.to.be.json;\r",
-              "});\r",
-              "\r",
-              "const source = pm.collectionVariables.get('response');\r",
-              "const target = pm.response.json();\r",
-              "\r",
-              "\r",
-              "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-              "    pm.expect(source.eventId).equal(target.eventId, 'Идентификатор собтия по которому получают коментарии должен соответствовать идентификатору коментария, созданного ранее');\r",
-              "  \r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
+      "name": "Добавление собственного комментария",
       "request": {
-        "method": "GET",
+        "method": "POST",
         "header": [
           {
-            "key": "Accept",
+            "key": "Content-Type",
             "value": "application/json"
           }
         ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Тестовый комментарий\"\n}"
+        },
         "url": {
-          "raw": "{{baseUrl}}/comments/:eventId",
+          "raw": "http://localhost:8080/users/1/comments?eventId=1",
+          "protocol": "http",
           "host": [
-            "{{baseUrl}}"
+            "localhost"
           ],
+          "port": "8080",
           "path": [
-            "comments",
-            ":eventId"
+            "users",
+            "1",
+            "comments"
           ],
-          "variable": [
+          "query": [
             {
               "key": "eventId",
-              "value": "{{eid}}",
-              "description": "код теущего события"
+              "value": "1"
             }
           ]
         }
       },
-      "response": []
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "eventid",
-      "value": "1",
-      "type": "default"
-    },
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8080",
-      "type": "default"
-    },
-    {
-      "key": "uid",
-      "value": "1",
-      "type": "default"
-    },
-    {
-      "key": "eid",
-      "value": "1",
-      "type": "default"
-    },
-    {
-      "key": "response",
-      "value": ""
-    },
-    {
-      "key": "comid",
-      "value": "1",
-      "type": "default"
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response contains required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('text');",
+              "    pm.expect(jsonData).to.have.property('authorId');",
+              "    pm.expect(jsonData).to.have.property('eventId');",
+              "    pm.expect(jsonData).to.have.property('created');",
+              "    pm.expect(jsonData).to.have.property('lastUpdatedOn');",
+              "});"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

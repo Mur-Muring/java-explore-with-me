@@ -36,6 +36,7 @@ public class StatisticsClient extends BaseClient {
         this.serviceName = serviceName;
     }
 
+
     public ResponseEntity<Object> postHit(HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         String url = request.getRequestURI();
