@@ -78,7 +78,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+              "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -397,7 +397,7 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+          "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
           "host": [
             "{{baseUrl}}"
           ],
@@ -517,7 +517,7 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments?eventId=:eventId",
+          "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
           "host": [
             "{{baseUrl}}"
           ],
@@ -628,7 +628,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+          "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
           "host": [
             "{{baseUrl}}"
           ],
@@ -834,7 +834,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+          "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
           "host": [
             "{{baseUrl}}"
           ],
@@ -981,8 +981,8 @@
           "            authorId: userid,\r",
           "            eventId:  eventid,\r",
           "            text: pm.variables.replaceIn('{{$randomLoremParagraphs}}'),\r",
-          "            created: this.getPastDateTime(),\r",
-          "            lastUpdatedOn: this.getPastDateTime()\r",
+          "            created: this.getFutureDateTime(),\r",
+          "            lastUpdatedOn: this.getFutureDateTime()\r",
           "        };\r",
           "    }\r",
           "\r",
@@ -997,8 +997,7 @@
           "            annotation: pm.variables.replaceIn('{{$randomLoremParagraph}}'),\r",
           "            category: categoryId,\r",
           "            description: pm.variables.replaceIn('{{$randomLoremParagraphs}}'),\r",
-          "            eventDate: this.getPastDateTime(),\r",
-          "            eventStatus: \"PUBLISHED\"",
+          "            eventDate: this.getFutureDateTime(),\r",
           "            location: {\r",
           "                lat: parseFloat(pm.variables.replaceIn('{{$randomLatitude}}')),\r",
           "                lon: parseFloat(pm.variables.replaceIn('{{$randomLongitude}}')),\r",
@@ -1019,7 +1018,7 @@
           "    }\r",
           "\r",
           "\r",
-          "    getPastDateTime(hourShift = 5, minuteShift=0, yearShift=-1) {\r",
+          "    getFutureDateTime(hourShift = 5, minuteShift=0, yearShift=0) {\r",
           "        let moment = require('moment');\r",
           "\r",
           "        let m = moment();\r",

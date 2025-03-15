@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.comments.Comment;
 import ru.practicum.ewm.comments.CommentMapper;
 import ru.practicum.ewm.comments.CommentRepository;
@@ -15,7 +13,6 @@ import ru.practicum.ewm.comments.dto.CommentInDto;
 import ru.practicum.ewm.comments.dto.CommentOutDto;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventStatus;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidatetionConflict;
 import ru.practicum.ewm.user.User;
@@ -103,15 +100,6 @@ public class CommentServiceBase implements CommentService {
     public CommentOutDto create(Long userId, Long eventId, CommentInDto commentDto) {
         Event event = ensureEventExists(eventId);
         User user = ensureUserExists(userId);
-
-        log.info("Проверяем статус события: id={}, статус={}", event.getId(), event.getEventStatus());
-        if (!EventStatus.PUBLISHED.equals(event.getEventStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя комментировать неопубликованное событие");
-        }
-
-        if (event.getEventDate().isAfter(LocalDateTime.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя комментировать событие, которое ещё не закончилось");
-        }
 
         return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
     }
